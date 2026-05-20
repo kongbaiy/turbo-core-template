@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import AppStyle from './app.module.css'
+import TestStyle from './test.module.scss'
 
 export default function App() {
     const [count, setCount] = useState(() => new Date().toTimeString())
@@ -11,13 +13,5 @@ export default function App() {
         return () => clearInterval(timer)
     }, [])
 
-    return (
-        <main className='app-shell'>
-            <h1>React in Turbo Core Template</h1>
-            <p>
-                This app was created inside the current monorepo architecture.
-            </p>
-            <p>{count}</p>
-        </main>
-    )
+    return <p className='text-red'>1111</p>
 }
