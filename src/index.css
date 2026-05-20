@@ -1,27 +1,26 @@
 :root {
-  font-family: system-ui, sans-serif;
-  color: #111827;
-  background: #f8fafc;
+    background: #f8fafc;
+    font-family: system-ui, sans-serif;
+    color: #111827;
 }
 
 body {
-  margin: 0;
+    margin: 0;
 }
 
 .app-shell {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 2rem;
-  text-align: center;
+    display: grid;
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+    place-items: center;
 }
 
 .app-shell h1 {
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin: 0;
+    margin: 0;
 }
 
 .app-shell p {
-  margin-top: 1rem;
-  color: #475569;
+    margin-top: 1rem;
+    color: #475569;
 }
