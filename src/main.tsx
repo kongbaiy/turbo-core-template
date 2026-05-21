@@ -5,12 +5,11 @@ import App from './App'
 import 'uno.css'
 import './index.css'
 
-import { RepoErrorBoundary as Error } from '@repo/react-components'
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-        <Error>
+        <RepoErrorBoundary>
+            <RepoButton />
             <App />
-        </Error>
+        </RepoErrorBoundary>
     </React.StrictMode>,
 )

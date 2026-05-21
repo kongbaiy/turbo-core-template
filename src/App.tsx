@@ -3,7 +3,7 @@ import AppStyle from './app.module.css'
 import TestStyle from './test.module.scss'
 
 export default function App() {
-    const [count, setCount] = useState(() => new Date().toTimeString())
+    const [count, setCount] = useStates(() => new Date().toTimeString())
 
     useEffect(() => {
         const timer = setInterval(() => {
