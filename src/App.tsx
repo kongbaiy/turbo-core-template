@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import AppStyle from './app.module.css'
-import TestStyle from './test.module.scss'
+// import AppStyle from './app.module.css'
+// import TestStyle from './test.module.scss'
 
 export default function App() {
-    const [count, setCount] = useStates(() => new Date().toTimeString())
+    const [count, setCount] = useState(() => new Date().toTimeString())
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -13,5 +13,5 @@ export default function App() {
         return () => clearInterval(timer)
     }, [])
 
-    return <p className='text-red'>1111</p>
+    return <p className='text-red'>{count}</p>
 }
