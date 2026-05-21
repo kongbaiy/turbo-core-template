@@ -5,6 +5,9 @@
         "module": "ESNext",
         "moduleResolution": "bundler",
         "noEmit": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strict": true,
         "types": ["vite/client"]
     },
     "include": ["src", "auto-imports.d.ts"]
