@@ -13,7 +13,9 @@ export default reactConfig([
         },
         rules: {
             // 确保 JSX 中未定义的组件会报错（但 globals 已声明，不会误报）
-            'react/jsx-no-undef': 'error',
+            'react/jsx-no-undef': ['error', { allowGlobals: true }],
+            // 但在 TypeScript 项目中通常关闭，因为 TS 编译器会做
+            'no-undef': 'off', // 保持关闭，避免双报错
         },
     },
 ])
