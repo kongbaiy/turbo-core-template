@@ -1,22 +1,44 @@
 import { register } from './qiankun'
 
+import { lightTheme } from '@repo/antd-theme'
+import { StyleProvider } from '@ant-design/cssinjs'
+import { ConfigProvider } from 'antd'
+
 export default function App() {
-    const [count, setCount] = useState(() => new Date().toTimeString())
+    const [time, setTime] = useState(() => new Date().toTimeString())
+    const [count, setCount] = useState(0)
     
     useEffect(() => {
         const timer = setInterval(() => {
-            setCount(() => new Date().toTimeString())
+            setTime(() => new Date().toTimeString())
         }, 1000)
-
-        register()
 
         return () => clearInterval(timer)
     }, [])
 
-    return <div>
-        <p>基座应用</p>
-        <div id='qiankun-child-container'></div>
+    useEffect(() => {
+        register()
+    }, [])
 
-        <p className='text-red'>{count}</p>
-    </div>
+    const handleAdd = ()=> {
+        setCount((count) => count+=1)
+    }
+
+    return (
+        <StyleProvider hashPriority='high'>
+            <ConfigProvider theme={lightTheme}>
+                <p>基座应用</p>
+                <p>
+                    <a href='/child'>进入子应用 (/child)</a>
+                    {' | '}
+                    <a href='/'>返回基座</a>
+                </p>
+                <div id='qiankun-child-container'></div>
+
+                <p className='text-red'>{time}</p>
+                <button onClick={handleAdd}>add</button>
+                <p>{count}</p>
+            </ConfigProvider>
+        </StyleProvider>
+    )
 }
