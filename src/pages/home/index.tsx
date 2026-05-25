@@ -1,10 +1,16 @@
 import type { ProSettings } from '@ant-design/pro-components'
 import { PageContainer, ProLayout } from '@ant-design/pro-components'
-// import { Button } from 'antd'
 import { useState } from 'react'
 import defaultProps from './menu'
 
 import styles from './index.module.scss'
+
+// const Logo = () => (
+//     <img
+//         width={80}
+//         src='https://test-cloud.szyplus.com/cloud-master/static/logo.1ee0622a.png'
+//     />
+// )
 
 const Demo = () => {
     const [settings] = useState<Partial<ProSettings> | undefined>({
