@@ -1,0 +1,12 @@
+.page-container {
+    :global {
+        .ant-page-header {
+            padding: 0;
+
+            .ant-page-header-footer {
+                margin-block-start: 0;
+                padding: 0;
+            }
+        }
+    }
+}
