@@ -1,4 +1,10 @@
-import { loadMicroApp, start } from 'qiankun'
+import {
+    // ObjectType,
+    // registerMicroApps,
+    // RegistrableApp,
+    loadMicroApp,
+    start,
+} from 'qiankun'
 
 // const microList: RegistrableApp<ObjectType>[] = [
 //     {
