@@ -1,76 +1,30 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-
+import { useState } from 'react'
 import {
     WechatWorkOutlined,
-    LockOutlined,
-    UserOutlined,
 } from '@ant-design/icons'
-import { Button, Checkbox, Divider, Form, Input, Modal, message } from 'antd'
-import type { FormProps } from 'antd'
+import { Button, Divider, Form, Input, Modal, message, Tabs, TabsProps } from 'antd'
 
 import styles from './index.module.scss'
-import { LOGO_URL, STORAGE_KEYS } from '../../constants'
+// import { LOGO_URL } from '../../constants'
 
-type LoginFormValues = {
-    username: string
-    password: string
-    autoLogin?: boolean
-}
+import Account from './account'
+import Mobile from './mobile'
 
-const getStoredUsername = () =>
-    localStorage.getItem(STORAGE_KEYS.username) ?? ''
-
-const saveLoginSession = (values: LoginFormValues) => {
-    localStorage.setItem(STORAGE_KEYS.token, 'mock-token')
-    localStorage.setItem(STORAGE_KEYS.username, values.username)
-
-    if (values.autoLogin) {
-        localStorage.setItem(STORAGE_KEYS.autoLogin, '1')
-    } else {
-        localStorage.removeItem(STORAGE_KEYS.autoLogin)
-    }
-}
+const items: TabsProps['items'] = [
+    {
+        key: 'key1',
+        label: '账号登录',
+        children: <Account />,
+    },
+    {
+        key: 'key2',
+        label: '手机号登录',
+        children: <Mobile />,
+    },
+];
 
 export default function Login() {
-    const [form] = Form.useForm<LoginFormValues>()
-    const [loading, setLoading] = useState(false)
     const [forgotOpen, setForgotOpen] = useState(false)
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        const autoLogin = localStorage.getItem(STORAGE_KEYS.autoLogin) === '1'
-        const token = localStorage.getItem(STORAGE_KEYS.token)
-
-        if (autoLogin && token) {
-            navigate('/home')
-            return
-        }
-
-        const username = getStoredUsername()
-        if (username) {
-            form.setFieldsValue({
-                username,
-                autoLogin: localStorage.getItem(STORAGE_KEYS.autoLogin) === '1',
-            })
-        }
-    }, [form])
-
-    const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
-        setLoading(true)
-        try {
-            await new Promise((resolve) => setTimeout(resolve, 600))
-            saveLoginSession(values)
-            message.success('登录成功').then(() => {
-                navigate('/')
-            })
-        } catch {
-            message.error('登录失败，请检查账号密码')
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const handleWechatLogin = () => {
         message.info('企业微信登录功能开发中')
     }
@@ -84,70 +38,11 @@ export default function Login() {
     return (
         <div className={styles.loginPage}>
             <aside className={styles.loginPanel}>
-                <div className={styles.logoBox}>
+                {/* <div className={styles.logoBox}>
                     <img src={LOGO_URL} alt='logo' className={styles.logo} />
-                </div>
+                </div> */}
 
-                <Form<LoginFormValues>
-                    layout='vertical'
-                    size='large'
-                    form={form}
-                    className={styles.loginForm}
-                    onFinish={onFinish}
-                    initialValues={{ autoLogin: false }}
-                >
-                    <Form.Item
-                        label='账号'
-                        name='username'
-                        rules={[{ required: true, message: '请输入账号' }]}
-                    >
-                        <Input
-                            prefix={<UserOutlined />}
-                            placeholder='请输入账号'
-                            autoComplete='username'
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        label='密码'
-                        name='password'
-                        rules={[{ required: true, message: '请输入密码' }]}
-                    >
-                        <Input.Password
-                            prefix={<LockOutlined />}
-                            placeholder='请输入密码'
-                            autoComplete='current-password'
-                        />
-                    </Form.Item>
-
-                    <div className={styles.formExtras}>
-                        <Form.Item
-                            name='autoLogin'
-                            valuePropName='checked'
-                            noStyle
-                        >
-                            <Checkbox>自动登录</Checkbox>
-                        </Form.Item>
-                        <Button
-                            type='link'
-                            className={styles.forgotLink}
-                            onClick={() => setForgotOpen(true)}
-                        >
-                            忘记密码
-                        </Button>
-                    </div>
-
-                    <Form.Item>
-                        <Button
-                            type='primary'
-                            htmlType='submit'
-                            block={true}
-                            loading={loading}
-                        >
-                            登 录
-                        </Button>
-                    </Form.Item>
-                </Form>
+                <Tabs defaultActiveKey="1" items={items} centered />
 
                 <div className={styles.otherLogin}>
                     <Divider plain>
