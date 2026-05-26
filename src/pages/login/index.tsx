@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import {
     WechatWorkOutlined,
     LockOutlined,
@@ -5,7 +8,6 @@ import {
 } from '@ant-design/icons'
 import { Button, Checkbox, Divider, Form, Input, Modal, message } from 'antd'
 import type { FormProps } from 'antd'
-import { useEffect, useState } from 'react'
 
 import styles from './index.module.scss'
 import { LOGO_URL, STORAGE_KEYS } from '../../constants'
@@ -34,13 +36,14 @@ export default function Login() {
     const [form] = Form.useForm<LoginFormValues>()
     const [loading, setLoading] = useState(false)
     const [forgotOpen, setForgotOpen] = useState(false)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const autoLogin = localStorage.getItem(STORAGE_KEYS.autoLogin) === '1'
         const token = localStorage.getItem(STORAGE_KEYS.token)
 
         if (autoLogin && token) {
-            window.location.replace('/')
+            navigate('/home')
             return
         }
 
@@ -58,8 +61,9 @@ export default function Login() {
         try {
             await new Promise((resolve) => setTimeout(resolve, 600))
             saveLoginSession(values)
-            message.success('登录成功')
-            window.location.replace('/')
+            message.success('登录成功').then(() => {
+                navigate('/')
+            })
         } catch {
             message.error('登录失败，请检查账号密码')
         } finally {

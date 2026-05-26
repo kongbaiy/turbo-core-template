@@ -1,16 +1,18 @@
-import type { ProSettings } from '@ant-design/pro-components'
-import { PageContainer, ProLayout } from '@ant-design/pro-components'
 import { useState } from 'react'
-import defaultProps from './menu'
+import { useMatches, useLocation } from 'react-router-dom'
 
 import styles from './index.module.scss'
 
-// const Logo = () => (
-//     <img
-//         width={80}
-//         src='https://test-cloud.szyplus.com/cloud-master/static/logo.1ee0622a.png'
-//     />
-// )
+import type { ProSettings } from '@ant-design/pro-components'
+import { PageContainer, ProLayout } from '@ant-design/pro-components'
+import defaultProps from './menu'
+
+const logo = (
+    <img
+        src='https://test-cloud.szyplus.com/cloud-master/static/logo.1ee0622a.png'
+        className={styles.logo}
+    />
+)
 
 const Demo = () => {
     const [settings] = useState<Partial<ProSettings> | undefined>({
@@ -18,16 +20,15 @@ const Demo = () => {
         layout: 'mix',
         splitMenus: true,
     })
-
-    const [pathname, setPathname] = useState('/list/sub-page/sub-sub-page1')
+    const [pathname, setPathname] = useState('/admin/sub-page1')
+    console.log('useMatches:', useMatches())
+    console.log('useLocation:', useLocation())
 
     return (
         <div className={styles.pageContainer}>
             <ProLayout
                 title=''
-                logo={
-                    'https://test-cloud.szyplus.com/cloud-master/static/logo.1ee0622a.png'
-                }
+                logo={logo}
                 token={{
                     header: {
                         heightLayoutHeader: 46,
