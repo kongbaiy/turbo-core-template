@@ -54,7 +54,7 @@ const Account = () => {
                     prefix={<UserOutlined />}
                     placeholder='请输入账号'
                     autoComplete='username'
-                    className={styles.loginInput}
+                    allowClear
                 />
             </Form.Item>
 
@@ -66,7 +66,7 @@ const Account = () => {
                     prefix={<LockOutlined />}
                     placeholder='请输入密码'
                     autoComplete='current-password'
-                    className={styles.loginInput}
+                    allowClear
                 />
             </Form.Item>
 
@@ -82,7 +82,6 @@ const Account = () => {
                 <Button
                     type='link'
                     size='small'
-                    className={styles.forgotLink}
                 >
                     忘记密码
                 </Button>

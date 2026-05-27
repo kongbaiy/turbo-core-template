@@ -6,8 +6,6 @@ import type { FormProps } from 'antd'
 import { Form, Input, message, Button, Space } from 'antd'
 
 import {
-    // LockOutlined,
-    // UserOutlined,
     MobileOutlined
 } from '@ant-design/icons'
 
@@ -55,7 +53,6 @@ const Account = () => {
                     prefix={<MobileOutlined />}
                     placeholder='请输入手机号'
                     autoComplete='username'
-                    className={styles.loginInput}
                 />
             </Form.Item>
 
