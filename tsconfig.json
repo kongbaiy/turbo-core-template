@@ -10,5 +10,5 @@
         "noEmit": true,
         "types": ["vite/client"]
     },
-    "include": ["src", "auto-imports.d.ts", "qiankun"]
+    "include": ["src", "auto-imports.d.ts", "qiankun", "../../types"]
 }

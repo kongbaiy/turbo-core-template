@@ -1,15 +1,14 @@
-
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './index.module.scss'
 
 import type { FormProps } from 'antd'
 import { Form, Input, Checkbox, message, Button } from 'antd'
+import { LockOutlined, UserOutlined } from '@ant-design/icons'
 
-import {
-    LockOutlined,
-    UserOutlined,
-} from '@ant-design/icons'
-
+import { getPublicKey, login } from '@/api'
+import { encryptLoginPassword } from '@repo/utils'
+import { useRequest } from '@repo/react-hooks'
 
 type LoginFormValues = {
     username: string
@@ -19,19 +18,33 @@ type LoginFormValues = {
 
 const Account = () => {
     const [form] = Form.useForm<LoginFormValues>()
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState<boolean>()
     const navigate = useNavigate()
 
-    const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
-        console.log(values)
-        setLoading(true)
+    const { data: publicKeyData } = useRequest<any>(
+        useCallback(() => getPublicKey(), []),
+    )
+
+    const onFinish: FormProps<LoginFormValues>['onFinish'] = async ({
+        autoLogin,
+        ...other
+    }) => {
         try {
-            await new Promise((resolve) => setTimeout(resolve, 600))
-            message.success('登录成功').then(() => {
-                navigate('/')
+            setLoading(true)
+
+            const loginPassword = await encryptLoginPassword(
+                other.password,
+                publicKeyData.publicKey,
+            )
+
+            await login({
+                ...other,
+                loginPassword,
+                platformCode: 'PLATFORM_PC',
             })
-        } catch {
-            message.error('登录失败，请检查账号密码')
+            await message.success('登录成功')
+
+            navigate('/home')
         } finally {
             setLoading(false)
         }
@@ -47,42 +60,42 @@ const Account = () => {
             initialValues={{ autoLogin: false }}
         >
             <Form.Item
-                name='username'
-                rules={[{ required: true, message: '请输入账号' }]}
+                name='loginAccount'
+                rules={[
+                    { required: true, message: '请输入账号' },
+                    { pattern: /^[^\s]*$/, message: '禁止输入空格' },
+                ]}
             >
                 <Input
                     prefix={<UserOutlined />}
                     placeholder='请输入账号'
-                    autoComplete='username'
+                    autoComplete='loginAccount'
                     allowClear
+                    maxLength={20}
                 />
             </Form.Item>
 
             <Form.Item
-                name='password'
-                rules={[{ required: true, message: '请输入密码' }]}
+                name='loginPassword'
+                rules={[
+                    { required: true, message: '请输入密码' },
+                    { pattern: /^[^\s]*$/, message: '禁止输入空格' },
+                ]}
             >
                 <Input.Password
                     prefix={<LockOutlined />}
                     placeholder='请输入密码'
                     autoComplete='current-password'
                     allowClear
+                    maxLength={20}
                 />
             </Form.Item>
 
-
             <div className={styles.formExtras}>
-                <Form.Item
-                    name='autoLogin'
-                    valuePropName='checked'
-                    noStyle
-                >
+                <Form.Item name='autoLogin' valuePropName='checked' noStyle>
                     <Checkbox>自动登录</Checkbox>
                 </Form.Item>
-                <Button
-                    type='link'
-                    size='small'
-                >
+                <Button type='link' size='small'>
                     忘记密码
                 </Button>
             </div>
@@ -101,4 +114,4 @@ const Account = () => {
     )
 }
 
-export default Account
+export default React.memo(Account)
