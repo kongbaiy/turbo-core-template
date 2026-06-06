@@ -1,27 +1,25 @@
 import { useState } from 'react'
+import styles from './index.module.scss'
+
 import {
     WechatWorkOutlined,
 } from '@ant-design/icons'
-import { Button, Divider, Form, Input, Modal, message, Tabs, TabsProps } from 'antd'
-
-import styles from './index.module.scss'
-// import { LOGO_URL } from '../../constants'
+import { Button, Divider, Form, Input, Modal, message } from 'antd'
 
 import Account from './account'
-import Mobile from './mobile'
 
-const items: TabsProps['items'] = [
-    {
-        key: 'key1',
-        label: '账号登录',
-        children: <Account />,
-    },
-    {
-        key: 'key2',
-        label: '手机号登录',
-        children: <Mobile />,
-    },
-];
+// const items: TabsProps['items'] = [
+//     {
+//         key: 'key1',
+//         label: '账号登录',
+//         children: <Account />,
+//     },
+//     {
+//         key: 'key2',
+//         label: '手机号登录',
+//         children: <Mobile />,
+//     },
+// ];
 
 export default function Login() {
     const [forgotOpen, setForgotOpen] = useState(false)
@@ -39,10 +37,12 @@ export default function Login() {
         <div className={styles.loginPage}>
             <aside className={styles.loginPanel}>
                 {/* <div className={styles.logoBox}>
-                    <img src={LOGO_URL} alt='logo' className={styles.logo} />
+                    <img alt='logo' className={styles.logo} />
                 </div> */}
 
-                <Tabs defaultActiveKey="1" items={items} centered />
+                {/* <Tabs defaultActiveKey="1" items={items} centered /> */}
+                <h1 className='mb-20px text-center'>欢迎使用运维平台</h1>
+                <Account />
 
                 <div className={styles.otherLogin}>
                     <Divider plain>

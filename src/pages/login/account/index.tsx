@@ -7,44 +7,70 @@ import { Form, Input, Checkbox, message, Button } from 'antd'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 
 import { getPublicKey, login } from '@/api'
-import { encryptLoginPassword } from '@repo/utils'
+import { encryptLoginPassword, setAccessToken } from '@repo/utils'
 import { useRequest } from '@repo/react-hooks'
+import { Rule } from 'antd/es/form'
 
 type LoginFormValues = {
-    username: string
-    password: string
+    loginAccount: string
+    loginPassword: string
     autoLogin?: boolean
 }
 
+const formRules: Record<string, Rule[]> = {
+    loginAccount: [
+        { required: true, message: '请输入账号' },
+        { pattern: /^[^\s]*$/, message: '禁止输入空格' },
+    ],
+    loginPassword: [
+        { required: true, message: '请输入密码' },
+        { pattern: /^[^\s]*$/, message: '禁止输入空格' },
+    ],
+}
+
 const Account = () => {
+    const navigate = useNavigate()
     const [form] = Form.useForm<LoginFormValues>()
     const [loading, setLoading] = useState<boolean>()
-    const navigate = useNavigate()
 
-    const { data: publicKeyData } = useRequest<any>(
+    const { data: publicKeyData, reload: reloadGetPublicKey } = useRequest<any>(
         useCallback(() => getPublicKey(), []),
     )
 
-    const onFinish: FormProps<LoginFormValues>['onFinish'] = async ({
+    const onFinish: FormProps<LoginFormValues>['onFinish'] = ({
         autoLogin,
         ...other
     }) => {
+        if (!publicKeyData?.publicKey) {
+            reloadGetPublicKey(() => sendLogin(other))
+            return
+        }
+        sendLogin(other)
+    }
+
+    const sendLogin = async (params: LoginFormValues) => {
         try {
             setLoading(true)
 
             const loginPassword = await encryptLoginPassword(
-                other.password,
+                params.loginPassword,
                 publicKeyData.publicKey,
             )
-
-            await login({
-                ...other,
+            const { data } = await login({
+                ...params,
                 loginPassword,
                 platformCode: 'PLATFORM_PC',
             })
-            await message.success('登录成功')
+            await message.open({
+                type: 'success',
+                content: '登录成功',
+            })
 
-            navigate('/home')
+            setAccessToken({
+                Authorization: data.accessToken,
+                sessionId: data.sessionId,
+            })
+            navigate('/', { replace: true })
         } finally {
             setLoading(false)
         }
@@ -59,13 +85,7 @@ const Account = () => {
             onFinish={onFinish}
             initialValues={{ autoLogin: false }}
         >
-            <Form.Item
-                name='loginAccount'
-                rules={[
-                    { required: true, message: '请输入账号' },
-                    { pattern: /^[^\s]*$/, message: '禁止输入空格' },
-                ]}
-            >
+            <Form.Item name='loginAccount' rules={formRules.loginAccount}>
                 <Input
                     prefix={<UserOutlined />}
                     placeholder='请输入账号'
@@ -75,13 +95,7 @@ const Account = () => {
                 />
             </Form.Item>
 
-            <Form.Item
-                name='loginPassword'
-                rules={[
-                    { required: true, message: '请输入密码' },
-                    { pattern: /^[^\s]*$/, message: '禁止输入空格' },
-                ]}
-            >
+            <Form.Item name='loginPassword' rules={formRules.loginPassword}>
                 <Input.Password
                     prefix={<LockOutlined />}
                     placeholder='请输入密码'
