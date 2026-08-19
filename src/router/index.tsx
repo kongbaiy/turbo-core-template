@@ -34,7 +34,7 @@ const routers = createBrowserRouter([
         path: '/test/*',
         handle: {
             microConfig: {
-                name: 'test',
+                name: 'turbo-qiankun-subapp2',
                 entry: `http://localhost:3011/__qiankun_entry.html?t=${Date.now()}`,
                 container: '#test',
                 props: {
