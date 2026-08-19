@@ -1,8 +1,5 @@
-import React from 'react'
-import { DataRouteObject } from 'react-router-dom'
+import { DataRouteObject, useLocation } from 'react-router-dom'
 import { loadMicroApp } from 'qiankun'
-import { useLocationSearch, useWatch } from '@repo/react-hooks'
-
 import router from '@/router'
 
 interface Props {
@@ -11,7 +8,6 @@ interface Props {
 
 interface ContainerProps {
     microApps: DataRouteObject[]
-    activeContainer: string
 }
 
 const getContainerId = (container: string) => {
@@ -19,27 +15,28 @@ const getContainerId = (container: string) => {
 }
 
 const Container = (props: ContainerProps) => {
-    const { microApps = [], activeContainer } = props
+    const { microApps = [] } = props
 
     return microApps.map((item: any) => {
         const { microConfig } = item?.handle || {}
 
-        return activeContainer === microConfig?.container ? (
+        return (
             <div
-                key={getContainerId(item.handle?.microConfig?.container)}
-                id={getContainerId(item.handle?.microConfig?.container)}
+                key={getContainerId(microConfig?.container)}
+                id={getContainerId(microConfig?.container)}
             ></div>
-        ) : null
+        )
     })
 }
 
 const KeepAliveContainer = (props: ContainerProps) => {
-    const { microApps = [], activeContainer } = props
+    const { microApps = [] } = props
+    const location = useLocation()
 
     return microApps.map((item: any) => {
         const { microConfig } = item?.handle || {}
-        const display =
-            activeContainer === microConfig?.container ? 'block' : 'none'
+        const path = item.path.replace(/\/\*/, '')
+        const display = location.pathname.startsWith(path) ? 'block' : 'none'
 
         return (
             <div
@@ -51,50 +48,66 @@ const KeepAliveContainer = (props: ContainerProps) => {
     })
 }
 
+const microAppCached = new Map()
 const CreateMicroApp = (props: Props) => {
     const { keepAlive = false } = props
-    const [basename] = useLocationSearch()
-    const [activeContainer, setActiveContainer] = useState<string>('')
+    const location = useLocation()
 
     const microApps: DataRouteObject[] = useMemo(
         () => router.routes.filter((item) => item.handle?.microConfig?.name),
         [],
     )
 
-    useWatch(() => {
-        const microApp = router.routes.find(
-            (item) =>
-                item.handle?.microConfig?.name && item.path?.includes(basename),
-        )
-        const { microConfig } = microApp?.handle || {}
+    // useLayoutEffect(() => {
+    //     const microApp: any = microApps.find((item: any) => {
+    //         const path = item.path.replace(/\/\*/, '')
+    //         return location.pathname.startsWith(path)
+    //     })
 
-        setActiveContainer(microConfig.container)
+    //     const cached = microAppCached.get(microApp.id)
 
-        if (microConfig) {
-            const microAppContainer = document.querySelector(
-                microConfig.container,
+    //     if (!cached) {
+    //         const microAppInstance = loadMicroApp(microApp?.handle?.microConfig)
+    //         microAppCached.set(microApp.id, microAppInstance)
+    //     } else {
+    //         cached?.update?.()
+    //     }
+    // }, [microApps, location])
+
+    // useEffect(() => {
+    //     microApps.forEach((item) => {
+    //         const cached = microAppCached.get(item.id)
+    //         if (cached) cached.unmount()
+    //     })
+    // }, [location.pathname])
+
+    useEffect(() => {
+        const microApp: any = microApps.find((item: any) => {
+            const path = item.path.replace(/\/\*/, '')
+            return location.pathname.startsWith(path)
+        })
+
+        const cached = microAppCached.get(microApp.id)
+        if (!cached) {
+            const microAppInstance = loadMicroApp(
+                microApp?.handle?.microConfig,
+                {
+                    sandbox: {
+                        experimentalStyleIsolation: true,
+                    },
+                },
             )
-
-            if (!microAppContainer || !microAppContainer?.children?.length)
-                loadMicroApp(microConfig)
+            microAppCached.set(microApp.id, microAppInstance)
+        } else {
+            cached.update?.()
         }
-    }, [basename])
+    }, [microApps, location.pathname])
 
-    return (
-        <>
-            {keepAlive ? (
-                <KeepAliveContainer
-                    microApps={microApps}
-                    activeContainer={activeContainer}
-                />
-            ) : (
-                <Container
-                    microApps={microApps}
-                    activeContainer={activeContainer}
-                />
-            )}
-        </>
+    return keepAlive ? (
+        <KeepAliveContainer microApps={microApps} />
+    ) : (
+        <Container microApps={microApps} />
     )
 }
 
-export default React.memo(CreateMicroApp)
+export default CreateMicroApp

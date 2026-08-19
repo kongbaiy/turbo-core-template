@@ -70,7 +70,7 @@ const Account = () => {
                 Authorization: data.accessToken,
                 sessionId: data.sessionId,
             })
-            navigate('/', { replace: true })
+            navigate('/platforms', { replace: true })
         } finally {
             setLoading(false)
         }

@@ -19,8 +19,6 @@ import { AnyObject } from 'antd/es/_util/type'
 import logoUrl from '@/assets/images/logo.png'
 import avatarUrl from '@/assets/images/avatar.jpg'
 
-import { AliveScope, KeepAlive } from 'react-activation'
-
 interface AvatarDropdownProps {
     dom: React.ReactNode
 }
@@ -144,28 +142,12 @@ const Index = () => {
                     header={{
                         title: '',
                     }}
-                    // tabList={[
-                    //     {
-                    //         tab: 'Basic information',
-                    //         key: 'base',
-                    //         closable: true,
-                    //     },
-                    //     {
-                    //         tab: 'Detailed information',
-                    //         key: 'info',
-                    //     },
-                    // ]}
                     tabProps={{
                         type: 'editable-card',
                         hideAdd: true,
                     }}
                     className={styles.pageContainer}
                 >
-                    {/* <AliveScope>
-                        <div id='qiankun-container'></div>
-                    </AliveScope>
-
-                    <div id='qiankun-container2'></div> */}
                     <CreateMicroApp keepAlive={true} />
                 </PageContainer>
             </ProLayout>
@@ -173,4 +155,4 @@ const Index = () => {
     )
 }
 
-export default () => <Index />
+export default Index
