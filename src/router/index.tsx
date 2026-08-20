@@ -40,10 +40,6 @@ const routers = createBrowserRouter([
                 props: {
                     basicActions: actions,
                 },
-                sandbox: {
-                    strictStyleIsolation: true,
-                    experimentalStyleIsolation: true,
-                },
             },
 
             name: '测试',
