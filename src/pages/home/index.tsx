@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import CreateMicroApp from '@/qiankun/create'
+import { useNavigate, useLocation, DataRouteObject } from 'react-router-dom'
+// import CreateMicroApp from '@/qiankun/create'
 import actions from '@/qiankun/actions'
-
-import styles from './index.module.scss'
+import router from '@/router'
 
 import { PageContainer, ProLayout } from '@ant-design/pro-components'
 import type { ProSettings } from '@ant-design/pro-components'
@@ -19,8 +18,15 @@ import { AnyObject } from 'antd/es/_util/type'
 import logoUrl from '@/assets/images/logo.png'
 import avatarUrl from '@/assets/images/avatar.jpg'
 
+import styles from './index.module.scss'
+import { loadMicroApp } from 'qiankun'
+
 interface AvatarDropdownProps {
     dom: React.ReactNode
+}
+
+interface ContainerProps {
+    microApps: DataRouteObject[]
 }
 
 const logo = <img src={logoUrl} className={styles.logo} />
@@ -60,18 +66,62 @@ const MenuItemRender = (
     item: AnyObject,
     dom: React.ReactNode,
     navigate: (to: string) => void,
+    microApps: any,
+    startMicroApp: any,
 ) => {
     return (
         <div
             style={{ width: '100%' }}
             onClick={() => {
-                navigate(item.path!)
+                console.log('MenuItemRender:', microAppCached)
+                const oldMicroApp: any = microApps.find((app: any) => {
+                    const path = app.path.replace(/\/\*/, '')
+                    return location.pathname.startsWith(path)
+                })
+                const newMicroApp: any = microApps.find((app: any) => {
+                    const path = app.path.replace(/\/\*/, '')
+                    return item.path.startsWith(path)
+                })
+
+                const app = microAppCached.get(oldMicroApp.id)
+                app.unmount()
+                microAppCached.delete(oldMicroApp.id)
+
+                app.unmountPromise.then(() => {
+                    navigate(item.path!)
+                    startMicroApp(newMicroApp)
+                })
             }}
         >
             {dom}
         </div>
     )
 }
+
+const getContainerId = (container: string) => {
+    return container.replace('#', '')
+}
+
+const KeepAliveContainer = (props: ContainerProps) => {
+    const { microApps = [] } = props
+    const location = useLocation()
+
+    return microApps.map((item: any) => {
+        const { microConfig } = item?.handle || {}
+        const path = item.path.replace(/\/\*/, '')
+        const display = location.pathname.startsWith(path) ? 'block' : 'none'
+
+        return (
+            <div
+                style={{ display }}
+                key={getContainerId(microConfig?.container)}
+                id={getContainerId(microConfig?.container)}
+            ></div>
+        )
+    })
+}
+
+const microAppCached = new Map()
 
 const Index = () => {
     const navigate = useNavigate()
@@ -91,7 +141,18 @@ const Index = () => {
         useCallback(() => getUserInfo(), []),
     )
 
+    const microApps: DataRouteObject[] = useMemo(
+        () => router.routes.filter((item) => item.handle?.microConfig?.name),
+        [],
+    )
+    const microApp: any = microApps.find((item: any) => {
+        const path = item.path.replace(/\/\*/, '')
+        return location.pathname.startsWith(path)
+    })
+
     useEffect(() => {
+        startMicroApp(microApp)
+
         actions.onGlobalStateChange(({ menu }: any) => {
             if (!menu?.length) return
 
@@ -114,6 +175,21 @@ const Index = () => {
         })
     }, [])
 
+    const startMicroApp = (app: any) => {
+        const cached = microAppCached.get(app.id)
+
+        if (!cached) {
+            const microAppInstance = loadMicroApp(app.handle?.microConfig, {
+                sandbox: {
+                    experimentalStyleIsolation: true,
+                },
+            })
+            microAppCached.set(app.id, microAppInstance)
+        } else {
+            cached.update?.()
+        }
+    }
+
     return (
         <div className={styles.pageContainer}>
             <ProLayout
@@ -128,7 +204,13 @@ const Index = () => {
                     render: (_, dom) => <AvatarDropdown dom={dom} />,
                 }}
                 menuItemRender={(item, dom) =>
-                    MenuItemRender(item, dom, navigate)
+                    MenuItemRender(
+                        item,
+                        dom,
+                        navigate,
+                        microApps,
+                        startMicroApp,
+                    )
                 }
                 menuDataRender={() => route.routes}
                 location={{
@@ -148,7 +230,8 @@ const Index = () => {
                     }}
                     className={styles.pageContainer}
                 >
-                    <CreateMicroApp keepAlive={true} />
+                    {/* <CreateMicroApp keepAlive={true} /> */}
+                    <KeepAliveContainer microApps={microApps} />
                 </PageContainer>
             </ProLayout>
         </div>
