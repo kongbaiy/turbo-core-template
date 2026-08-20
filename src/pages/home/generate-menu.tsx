@@ -23,7 +23,7 @@ export const generateMenu = (
         }
 
         return {
-            path: `${rootPath}${parentPath}${path}`,
+            path: `${parentPath}${path}`,
             name: handle.name,
             icon: handle.icon && <RenderIcon name={handle.icon} />,
             access: handle.access,
